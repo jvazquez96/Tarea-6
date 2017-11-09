@@ -6,7 +6,7 @@ central() -> 'central@MiguelBanda'.
 
 % funciones de interfase
 reportar(Quien, Placas, Modelo) ->
-	llama_central({Quien, Placas, Modelo}).
+	llama_central(regisrar, {Quien, Placas, Modelo}).
 
 % cliente taxi
 llama_central(Registro) ->
