@@ -12,9 +12,9 @@ reportar(Quien, Placas, Modelo) ->
 llama_central(Registro) ->
 	Central = central(),
 	monitor_node(Central, true),
-	{servidor_central, Central} ! {self(), Registro},
+	{central_taxi, Central} ! {self(), Registro},
 	receive
-	{servidor_central, Respuesta} ->
+	{central_taxi, Respuesta} ->
 		monitor_node(Central, false),
 		Respuesta;
 	{nodedown, Central} ->
