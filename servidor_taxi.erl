@@ -1,6 +1,7 @@
 -module(servidor_taxi).
 -export([inicio/0, servidor/1]).
 -import(math, [pow/2, sqrt/1]).
+-import(lists, [append/2]).
 %-------------------------------------------------------------------------------
 
 
@@ -10,7 +11,7 @@ servidor(TablaCentrales) ->
 	% Un cliente solicita un taxi
 	{PID, {solicita, NombreCliente, {X,Y}}} ->
 		io:format("Recibida SOLICITUD del cliente: ~p, ubicado en ~p~n", [NombreCliente,{X,Y}]),
-		register(NombreCliente, PID),
+		% register(NombreCliente, PID),
 		solicitaTaxi(TablaCentrales, PID, {X,Y}),
 		servidor(TablaCentrales);
 
@@ -22,10 +23,9 @@ servidor(TablaCentrales) ->
 	{PIDcentral, {registra_central, NombreCentral, {X,Y}}} ->
 		io:format("Servidor recibe REGISTRO DE CENTRAL: ~p, ubicada en: 
 			~p~n", [NombreCentral, {X,Y}]),
-		register(NombreCentral, PIDcentral),
-		TablaCentrales = TablaCentrales ++ {PIDcentral, NombreCentral, {X,Y}},
-		NombreCentral ! {self(), registrado},
-		servidor(TablaCentrales);
+		% register(NombreCentral, PIDcentral),
+		PIDcentral ! {self(), registrado},
+		servidor(lists:append(TablaCentrales, [{PIDcentral, NombreCentral, {X,Y}}]));
 
 	% Respuesta del cliente indicando que llegó al destino
 	{_, {_, ok}} ->
@@ -63,13 +63,14 @@ calcula_distancia({Xcli,Ycli}, {Xtax,Ytax}) ->
 %-------------------------------------------------------------------------------
 buscaCentralCercana(DatosDeCentral, {A,B}) ->
 	PID = self(),
-	buscaCentralCercanaAux(DatosDeCentral, {A,B}, 1000000.00, PID),
-	PID.
+	PID = buscaCentralCercanaAux(DatosDeCentral, {A,B}, 1000000.00, PID).
 
 %-------------------------------------------------------------------------------
 buscaCentralCercanaAux([{PIDcentral, _, {X,Y}}|T], {A, B}, DistMenor, PID) ->
 	DistanciaCliente = calcula_distancia({A,B},{X,Y}),
 	if
+		[], _, _, _ -> PID;
 		DistanciaCliente < DistMenor -> buscaCentralCercanaAux(T, {A,B}, DistanciaCliente, PIDcentral);
 		true -> buscaCentralCercanaAux(T, {A,B}, DistMenor, PID)
 	end.
+

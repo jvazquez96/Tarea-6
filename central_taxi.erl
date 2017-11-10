@@ -6,7 +6,7 @@ inicio() ->
 	register(central_taxi,
 		spawn(central_taxi, central, [[], [], [], []])).
 
-matriz() -> 'inicia_servidor@Jorges-Macbook-Pro-3'.
+matriz() -> 'servidor@Jorges-MacBook-Pro-3'.
 
 registro(Quien, {X, Y}) -> 
 	llama_servidor({registra_central, Quien, {X, Y}}).
@@ -22,6 +22,8 @@ central(Disponibles, Completados, Cancelados, Servicios) ->
 			completado(De, Modelo, Placas, Cliente, Disponibles, Completados, Cancelados, Servicios);
 		{De, {necesito_taxi, Cliente, X, Y}} ->
 			asigna_taxi(De, Cliente, Disponibles, Completados, Cancelados, Servicios, X, Y);
+		{_, registrado} ->
+			registrado;
 		lista ->
 			io:format("Disponibles:~n"),
 			disponibles(Disponibles),
@@ -62,6 +64,8 @@ llama_servidor(Mensaje) ->
 		{servidor_taxi, Respuesta} ->
 			monitor_node(Matriz, false),
 			Respuesta;
+	{_, registrado} ->
+			registrado;
 		{nodedown, Matriz} ->
 			no
 	end.
