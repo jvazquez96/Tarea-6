@@ -4,9 +4,9 @@
 
 inicio() ->
 	register(central_taxi,
-		spawn(central_taxi, central_taxi, [[]])).
+		spawn(central_taxi, central, [[], [], [], []])).
 
-matriz() -> 'servidor@Kinedus-MacBook-Pro-2'.
+matriz() -> 'servidor@Jorges-Macbook-Pro-3'.
 
 registro(Quien, {X, Y}) -> 
 	llama_servidor({registro, Quien, {X, Y}}).

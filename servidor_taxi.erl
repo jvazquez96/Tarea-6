@@ -1,7 +1,9 @@
 -module(servidor_taxi).
--export([inicia_servidor/1]).
+-export([inicio/0, inicia_servidor/1]).
 -import(math, [pow/2, sqrt/1]).
 %-------------------------------------------------------------------------------
+
+
 inicia_servidor(TablaCentrales) ->
 	receive
 
@@ -42,6 +44,9 @@ inicia_servidor(TablaCentrales) ->
 		PIDcliente ! {self(), no_hay_taxis},
 		inicia_servidor(TablaCentrales)
 	end.
+
+inicio() ->
+	register(servidor_taxi, spawn(servidor_taxi, inicia_servidor, [[]])).
 
 %-------------------------------------------------------------------------------
 solicitaTaxi(TablaCentrales, PIDcliente, {A,B}) ->

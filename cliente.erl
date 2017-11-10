@@ -1,7 +1,7 @@
 -module(cliente).
 -export([solicitar/2, cancela/0, mandar_ok/0]).
 
-matrizServidor() -> 'servidor@Jorges-Macbook-Pro-3'.
+matrizServidor() -> 'inicia_servidor@Jorges-Macbook-Pro-3'.
 
 solicitar(Nombre, {X, Y}) ->
 	server({solicita, Nombre, {X, Y}}).
@@ -34,5 +34,5 @@ server(Solicitud) ->
 			monitor_node(Matriz, false),
 			mandar_ok();
 		{nodedown, Matriz} ->
-			no
+			puta
 	end.
