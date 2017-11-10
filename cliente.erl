@@ -1,5 +1,5 @@
 -module(cliente).
--export([solicitar/2, cancela/0, ok/0]).
+-export([solicitar/2, cancela/0, mandar_ok/0]).
 
 matrizServidor() -> 'servidor@Jorges-Macbook-Pro-3'.
 
@@ -16,8 +16,6 @@ matrizServidor() -> 'servidor@Jorges-Macbook-Pro-3'.
 % avisa que no hay taxis disponibles. El proceso del cliente debe terminar
 % automáticamente si el nodo o proceso del servidor no existen o terminan.
 
-% PIDcliente ! {self(), {PIDtaxi, tipoAuto, placaAuto}}
-
 solicitar(Nombre, {X, Y}) ->
 	server({solicita, Nombre, {X, Y}}).
 
@@ -25,16 +23,17 @@ registra(_, PID) ->
 	register(taxi, PID).
 
 cancela() ->
-	taxi ! {cancelar}.
+	case whereis(taxi) of
+		undefined -> no_has_pedido_taxi;
+		_ -> taxi ! {cancelar}
+	end.
 
-ok() ->
-	server({terminar, taxi}).
 
 mandar_ok() ->
-	taxi ! ok.
-
-
-
+	case whereis(taxi) of 
+		undefined -> no_has_pedido_taxi;
+		_ -> taxi ! ok
+	end.
 
 server(Solicitud) ->
 	Matriz = matrizServidor(),
