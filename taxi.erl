@@ -30,14 +30,14 @@ llama_central(Registro) ->
 	receive
 		{Central, Respuesta} ->
 			datos_cliente(Central, Respuesta),
-			llama_central(Response);
+			llama_central(response);
 		{_, cancelar} ->
 			cancelado,
-			llama_central(Response);
+			llama_central(response);
 		{_, ok} ->
 			completado,
-			llama_central(Response);
+			llama_central(response);
 		{nodedown, Central} ->
 			no,
-			llama_central(Response);
+			llama_central(response)
 	end.
