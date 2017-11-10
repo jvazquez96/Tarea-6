@@ -49,7 +49,8 @@ inicio() ->
 	register(servidor_taxi, spawn(servidor_taxi, servidor, [[]])).
 
 %-------------------------------------------------------------------------------
-solicitaTaxi([], _, _) ->
+solicitaTaxi([], PID, _) ->
+	PID ! {no},
 	io:format("No hay centrales disponibles~n",[]);
 
 solicitaTaxi(TablaCentrales, PIDcliente, {A,B}) ->
@@ -69,7 +70,6 @@ buscaCentralCercana(DatosDeCentral, {A,B}) ->
 buscaCentralCercanaAux([{PIDcentral, _, {X,Y}}|T], {A, B}, DistMenor, PID) ->
 	DistanciaCliente = calcula_distancia({A,B},{X,Y}),
 	if
-		[], _, _, _ -> PID;
 		DistanciaCliente < DistMenor -> buscaCentralCercanaAux(T, {A,B}, DistanciaCliente, PIDcentral);
 		true -> buscaCentralCercanaAux(T, {A,B}, DistMenor, PID)
 	end.

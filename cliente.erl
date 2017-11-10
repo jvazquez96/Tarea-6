@@ -33,6 +33,8 @@ server(Solicitud) ->
 		{llegar} ->
 			monitor_node(Matriz, false),
 			mandar_ok();
+		{no} ->
+			io:format("No hay centrales disponibles~n",[]);
 		{nodedown, Matriz} ->
 			puta
 	end.
