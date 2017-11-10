@@ -56,6 +56,7 @@ solicitaTaxi([], PID, _) ->
 
 solicitaTaxi(TablaCentrales, PIDcliente, {A,B}) ->
 	TaxiPID = buscaCentralCercana(TablaCentrales,{A,B}),
+	io:format("Process id: ~p~n", [TaxiPID]),
 	TaxiPID ! {self(), {necesito_taxi, PIDcliente, {A,B}}}.
 
 %-------------------------------------------------------------------------------
@@ -66,8 +67,7 @@ calcula_distancia({Xcli,Ycli}, {Xtax,Ytax}) ->
 %-------------------------------------------------------------------------------
 buscaCentralCercana(DatosDeCentral, {A,B}) ->
 	PID = self(),
-	buscaCentralCercanaAux(DatosDeCentral, {A,B}, 1000000.00, PID),
-	io:format("Process id: ~p~n", [PID]).
+	buscaCentralCercanaAux(DatosDeCentral, {A,B}, 1000000.00, PID).
 
 %-------------------------------------------------------------------------------
 buscaCentralCercanaAux([], _, _, PID) ->
