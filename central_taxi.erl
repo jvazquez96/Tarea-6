@@ -20,8 +20,7 @@ central(Disponibles, Completados, Cancelados, Servicios) ->
 			cancelado(De, Modelo, Placas, Cliente, Disponibles, Completados, Cancelados, Servicios);
 		{De, {completar, Modelo, Placas, Cliente}} ->
 			completado(De, Modelo, Placas, Cliente, Disponibles, Completados, Cancelados, Servicios);
-		{De, {necesito_taxi, Cliente, X, Y}} ->
-			asigna_taxi(De, Cliente, Disponibles, Completados, Cancelados, Servicios, X, Y);
+		
 		{_, registrado} ->
 			registrado;
 		lista ->
@@ -64,8 +63,10 @@ llama_servidor(Mensaje) ->
 		{servidor_taxi, Respuesta} ->
 			monitor_node(Matriz, false),
 			Respuesta;
-	{_, registrado} ->
+		{_, registrado} ->
 			registrado;
+		{servidor_taxi, {necesito_taxi, Cliente, {X, Y}} ->
+			asigna_taxi(De, Cliente, Disponibles, Completados, Cancelados, Servicios, X, Y);
 		{nodedown, Matriz} ->
 			no
 	end.
