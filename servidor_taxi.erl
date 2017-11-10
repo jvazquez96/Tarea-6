@@ -70,7 +70,7 @@ buscaCentralCercana(DatosDeCentral, {A,B}) ->
 %-------------------------------------------------------------------------------
 buscaCentralCercanaAux([{PIDcentral, Nombre, {X,Y}}|T], {A, B}, DistMenor, PID) ->
 	DistanciaCliente = calcula_distancia({A,B},{X,Y}),
-	io:format("")
+	io:format(""),
 	if
 		[{PIDcentral, Nombre, {X,Y}}] == [] -> PID;
 		DistanciaCliente < DistMenor -> buscaCentralCercanaAux(T, {A,B}, DistanciaCliente, PIDcentral);
