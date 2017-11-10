@@ -1,5 +1,5 @@
 -module(taxi).
--export([central/0, reportar/2, llegar/0, datos_cliente/2, llama_central/1]).
+-export([central/0, reportar/2, llegar/0, datos_cliente/2, llama_central/1, cancelar/2, completar/2]).
 
 % nombre largo del servidor (nombre@máquina)
 central() -> 'central@MiguelBanda'.
@@ -8,14 +8,17 @@ central() -> 'central@MiguelBanda'.
 reportar(Modelo, Placas) ->
 	llama_central({registrar, Modelo, Placas}).
 
-receive
-	{cliente, Cancelar} ->
-	llama_central({cancelar, Modelo, Placas})
-end.
+cancelar(Modelo, Placas) ->
+	llama_central({cancelar, Modelo, Placas, whereis(cliente)}).
 
-datos_cliente (Pid, {_,_}) ->
-	register(cliente, Pid).
+completar(Modelo, Placas) ->
+	llama_central({completar, Modelo, Placas, whereis(cliente)}).
 
+% Obtiene datos del cliente
+datos_cliente (_, {Pid_Cliente, {_, _}}) ->
+	register(cliente, Pid_Cliente).
+
+% Funcion para avisar que ya llego al destino el taxi
 llegar() ->
 	cliente ! llegar.
 
@@ -25,9 +28,12 @@ llama_central(Registro) ->
 	monitor_node(Central, true),
 	{central_taxi, Central} ! {self(), Registro},
 	receive
-	{central_taxi, Respuesta} ->
-		% monitor_node(Central, false),
-		datos_cliente(Respuesta);
-	{nodedown, Central} ->
-		no
+		{Central, Respuesta} ->
+			datos_cliente(Central, Respuesta);
+		{_, cancelar} ->
+			cancelado;
+		{_, ok} ->
+			completado;
+		{nodedown, Central} ->
+			no
 	end.
