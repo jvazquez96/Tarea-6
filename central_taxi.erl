@@ -6,10 +6,10 @@ inicio() ->
 	register(central_taxi,
 		spawn(central_taxi, central, [[], [], [], []])).
 
-matriz() -> 'servidor@Jorges-Macbook-Pro-3'.
+matriz() -> 'inicia_servidor@Jorges-Macbook-Pro-3'.
 
 registro(Quien, {X, Y}) -> 
-	llama_servidor({registro, Quien, {X, Y}}).
+	llama_servidor({registra_central, Quien, {X, Y}}).
 
 central(Disponibles, Completados, Cancelados, Servicios) ->
 	receive
