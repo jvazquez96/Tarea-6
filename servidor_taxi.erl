@@ -19,8 +19,8 @@ servidor(TablaCentrales) ->
 	para ->
 		io:format("Servidor recibe PARA, finalizando ejecucion~n",[]);
 
-	% Una central se quiere dar de alta
-	{PIDcentral, {registra_central, NombreCentral, {X,Y}}} ->
+	% Una central se quieresdar de alta
+	{PIDcentral, {registra_central, NombreCentral , {X,Y}}} ->
 		io:format("Servidor recibe REGISTRO DE CENTRAL: ~p, ubicada en: 
 			~p~n", [NombreCentral, {X,Y}]),
 		% register(NombreCentral, PIDcentral),
@@ -54,7 +54,8 @@ solicitaTaxi([], PID, _) ->
 	io:format("No hay centrales disponibles~n",[]);
 
 solicitaTaxi(TablaCentrales, PIDcliente, {A,B}) ->
-	buscaCentralCercana(TablaCentrales,{A,B}) ! {self(), {necesito_taxi, PIDcliente, {A,B}}}.
+	TaxiPID = buscaCentralCercana(TablaCentrales,{A,B}),
+	TaxiPID ! {self(), {necesito_taxi, PIDcliente, {A,B}}}.
 
 %-------------------------------------------------------------------------------
 calcula_distancia({Xcli,Ycli}, {Xtax,Ytax}) ->
@@ -64,12 +65,14 @@ calcula_distancia({Xcli,Ycli}, {Xtax,Ytax}) ->
 %-------------------------------------------------------------------------------
 buscaCentralCercana(DatosDeCentral, {A,B}) ->
 	PID = self(),
-	PID = buscaCentralCercanaAux(DatosDeCentral, {A,B}, 1000000.00, PID).
+	buscaCentralCercanaAux(DatosDeCentral, {A,B}, 1000000.00, PID).
 
 %-------------------------------------------------------------------------------
-buscaCentralCercanaAux([{PIDcentral, _, {X,Y}}|T], {A, B}, DistMenor, PID) ->
+buscaCentralCercanaAux([{PIDcentral, Nombre, {X,Y}}|T], {A, B}, DistMenor, PID) ->
 	DistanciaCliente = calcula_distancia({A,B},{X,Y}),
+	io:format("")
 	if
+		[{PIDcentral, Nombre, {X,Y}}] == [] -> PID;
 		DistanciaCliente < DistMenor -> buscaCentralCercanaAux(T, {A,B}, DistanciaCliente, PIDcentral);
 		true -> buscaCentralCercanaAux(T, {A,B}, DistMenor, PID)
 	end.

@@ -36,5 +36,5 @@ server(Solicitud) ->
 		{no} ->
 			io:format("No hay centrales disponibles~n",[]);
 		{nodedown, Matriz} ->
-			puta
+			adios
 	end.
