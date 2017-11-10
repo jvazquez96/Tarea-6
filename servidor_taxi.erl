@@ -1,16 +1,16 @@
--module(servidor_taxi)
--export()
-
+-module(servidor_taxi).
+-export([inicia_servidor/1]).
+-import(math, [pow/2, sqrt/1]).
 %-------------------------------------------------------------------------------
-inicia_servidor() ->
+inicia_servidor(TablaCentrales) ->
 	receive
 
 	% Un cliente solicita un taxi
 	{PID, {solicita, NombreCliente, {X,Y}}} ->
 		io:format("Recibida SOLICITUD del cliente: ~p, ubicado en ~p~n", [NombreCliente,{X,Y}]),
 		register(NombreCliente, PID),
-		solicitaTaxi(PID, {X,Y}),
-		inicia_servidor();
+		solicitaTaxi(TablaCentrales, PID, {X,Y}),
+		inicia_servidor(TablaCentrales);
 
 	% Se para el servidor
 	para ->
@@ -21,29 +21,30 @@ inicia_servidor() ->
 		io:format("Servidor recibe REGISTRO DE CENTRAL: ~p, ubicada en: 
 			~p~n", [NombreCentral, {X,Y}]),
 		register(NombreCentral, PIDcentral),
+		TablaCentrales = TablaCentrales ++ {PIDcentral, NombreCentral, {X,Y}},
 		NombreCentral ! {self(), registrado},
-		inicia_servidor();
+		inicia_servidor(TablaCentrales);
 
 	% Respuesta del cliente indicando que llegó al destino
-	{PIDcliente, {PIDtaxi, ok}} ->
+	{_, {_, ok}} ->
 		io:format("El cliente llego al destino~n",[]),
-		inicia_servidor();
+		inicia_servidor(TablaCentrales);
 
 	% Respuesta de la central de taxis con un taxi para el cliente
-	{PIDcentral, PIDcliente, {PIDtaxi, TipoAuto, PlacaAuto}} ->
+	{_, PIDcliente, {PIDtaxi, TipoAuto, PlacaAuto}} ->
 		io:format("Respuesta con TAXI recibida de CENTRAL~n",[]),
 		PIDcliente ! {self(), {PIDtaxi, TipoAuto, PlacaAuto}},
-		inicia_servidor();
+		inicia_servidor(TablaCentrales);
 
 	% Respuesta de la central de taxis indicando que no hay taxis disponibles
-	{PIDcentral, {sin_taxis, PIDcliente}} ->
+	{_, {sin_taxis, PIDcliente}} ->
 		io:format("Respuesta recibida de central, NO HAY TAXIS~n",[]),
 		PIDcliente ! {self(), no_hay_taxis},
-		inicia_servidor();
+		inicia_servidor(TablaCentrales)
 	end.
 
 %-------------------------------------------------------------------------------
-solicitaTaxi(PIDcliente, {A,B}) ->
+solicitaTaxi(TablaCentrales, PIDcliente, {A,B}) ->
 	buscaCentralCercana(TablaCentrales,{A,B}) ! {self(), {necesito_taxi, PIDcliente, {A,B}}}.
 
 %-------------------------------------------------------------------------------
@@ -56,16 +57,14 @@ buscaCentralCercana([],_) ->
 	io:format("No hay centrales disponibles~n",[]);
 
 buscaCentralCercana(DatosDeCentral, {A,B}) ->
-	buscaCentralCercanaAux(DatosDeCentral, {A,B}, 1000000.00, self()),
+	PID = self(),
+	buscaCentralCercanaAux(DatosDeCentral, {A,B}, 1000000.00, PID),
 	PID.
 
 %-------------------------------------------------------------------------------
-buscaCentralCercanaAux([{PIDcentral, NombreCentral, {X,Y}}|T], {A,B}, DistMenor, PID) ->
-
+buscaCentralCercanaAux([{PIDcentral, _, {X,Y}}|T], {A, B}, DistMenor, PID) ->
 	DistanciaCliente = calcula_distancia({A,B},{X,Y}),
-
 	if
-		DistanciaCliente < DistMenor -> (T, {A,B}, DistanciaCliente, PIDcentral),
-		true -> buscaCentralCercana(T, {A,B}, DistMenor, PID)
-	end
-
+		DistanciaCliente < DistMenor -> buscaCentralCercanaAux(T, {A,B}, DistanciaCliente, PIDcentral);
+		true -> buscaCentralCercanaAux(T, {A,B}, DistMenor, PID)
+	end.
