@@ -1,10 +1,10 @@
 -module(servidor_taxi).
--export([inicio/0, inicia_servidor/1]).
+-export([inicio/0, servidor/1]).
 -import(math, [pow/2, sqrt/1]).
 %-------------------------------------------------------------------------------
 
 
-inicia_servidor(TablaCentrales) ->
+servidor(TablaCentrales) ->
 	receive
 
 	% Un cliente solicita un taxi
@@ -12,7 +12,7 @@ inicia_servidor(TablaCentrales) ->
 		io:format("Recibida SOLICITUD del cliente: ~p, ubicado en ~p~n", [NombreCliente,{X,Y}]),
 		register(NombreCliente, PID),
 		solicitaTaxi(TablaCentrales, PID, {X,Y}),
-		inicia_servidor(TablaCentrales);
+		servidor(TablaCentrales);
 
 	% Se para el servidor
 	para ->
@@ -25,28 +25,28 @@ inicia_servidor(TablaCentrales) ->
 		register(NombreCentral, PIDcentral),
 		TablaCentrales = TablaCentrales ++ {PIDcentral, NombreCentral, {X,Y}},
 		NombreCentral ! {self(), registrado},
-		inicia_servidor(TablaCentrales);
+		servidor(TablaCentrales);
 
 	% Respuesta del cliente indicando que llegó al destino
 	{_, {_, ok}} ->
 		io:format("El cliente llego al destino~n",[]),
-		inicia_servidor(TablaCentrales);
+		servidor(TablaCentrales);
 
 	% Respuesta de la central de taxis con un taxi para el cliente
 	{_, PIDcliente, {PIDtaxi, TipoAuto, PlacaAuto}} ->
 		io:format("Respuesta con TAXI recibida de CENTRAL~n",[]),
 		PIDcliente ! {self(), {PIDtaxi, TipoAuto, PlacaAuto}},
-		inicia_servidor(TablaCentrales);
+		servidor(TablaCentrales);
 
 	% Respuesta de la central de taxis indicando que no hay taxis disponibles
 	{_, {sin_taxis, PIDcliente}} ->
 		io:format("Respuesta recibida de central, NO HAY TAXIS~n",[]),
 		PIDcliente ! {self(), no_hay_taxis},
-		inicia_servidor(TablaCentrales)
+		servidor(TablaCentrales)
 	end.
 
 inicio() ->
-	register(servidor_taxi, spawn(servidor_taxi, inicia_servidor, [[]])).
+	register(servidor_taxi, spawn(servidor_taxi, servidor, [[]])).
 
 %-------------------------------------------------------------------------------
 solicitaTaxi(TablaCentrales, PIDcliente, {A,B}) ->
