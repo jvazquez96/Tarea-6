@@ -16,11 +16,12 @@ matrizServidor() -> 'servidor@Jorges-Macbook-Pro-3'.
 % avisa que no hay taxis disponibles. El proceso del cliente debe terminar
 % automáticamente si el nodo o proceso del servidor no existen o terminan.
 
+% PIDcliente ! {self(), {PIDtaxi, tipoAuto, placaAuto}}
 
 solicitar(Nombre, {X, Y}) ->
 	server({solicita, Nombre, {X, Y}}).
 
-registra({_, PID, _, _}) ->
+registra(_, PID) ->
 	register(taxi, PID).
 
 cancela() ->
@@ -29,14 +30,23 @@ cancela() ->
 ok() ->
 	server({terminar, taxi}).
 
+mandar_ok() ->
+	taxi ! ok.
+
+
+
+
 server(Solicitud) ->
 	Matriz = matrizServidor(),
 	monitor_node(Matriz, true),
 	{servidor_taxi, Matriz} ! {self(), Solicitud},
 	receive
-		{servidor_taxi, Respuesta} ->
+		{Quien, {PID, _, _}} ->
 			monitor_node(Matriz, false),
-			registra(Respuesta);
+			registra(Quien, PID);
+		{llegar} ->
+			monitor_node(Matriz, false),
+			mandar_ok();
 		{nodedown, Matriz} ->
 			no
 	end.
