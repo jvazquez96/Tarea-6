@@ -29,11 +29,15 @@ llama_central(Registro) ->
 	{central_taxi, Central} ! {self(), Registro},
 	receive
 		{Central, Respuesta} ->
-			datos_cliente(Central, Respuesta);
+			datos_cliente(Central, Respuesta),
+			llama_central(Response);
 		{_, cancelar} ->
-			cancelado;
+			cancelado,
+			llama_central(Response);
 		{_, ok} ->
-			completado;
+			completado,
+			llama_central(Response);
 		{nodedown, Central} ->
-			no
+			no,
+			llama_central(Response);
 	end.
