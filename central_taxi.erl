@@ -1,6 +1,6 @@
 -module(central_taxi).
 -import(lists, [append/2]).
--export([inicio/0, central/4, para/0, listar/0]).
+-export([inicio/0, central/4, para/0, listar/0, registrar/2]).
 
 inicio() ->
 	register(central_taxi,
