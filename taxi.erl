@@ -2,7 +2,7 @@
 -export([central/0, reportar/2, llegar/0, datos_cliente/2, llama_central/1, cancelar/2, completar/2]).
 
 % nombre largo del servidor (nombre@máquina)
-central() -> 'central@Jorges-Macbook-Pro-3'.
+central() -> 'central@MacBook-Pro-de-Miguel'.
 
 % funciones de interfase
 reportar(Modelo, Placas) ->
@@ -29,15 +29,18 @@ llama_central(Registro) ->
 	{central_taxi, Central} ! {self(), Registro},
 	receive
 		{Central, Respuesta} ->
-			datos_cliente(Central, Respuesta),
-			llama_central(response);
+			datos_cliente(Central, Respuesta);
+			%llama_central(response);
 		{_, cancelar} ->
-			cancelado,
-			llama_central(response);
+			cancelado;
+			%llama_central(response);
 		{_, ok} ->
-			completado,
-			llama_central(response);
+			completado;
+			%llama_central(response);
 		{nodedown, Central} ->
-			no,
-			llama_central(response)
+			no
+			%llama_central(response)
 	end.
+
+
+

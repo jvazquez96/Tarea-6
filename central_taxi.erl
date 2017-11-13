@@ -6,7 +6,7 @@ inicio() ->
 	register(central_taxi,
 		spawn(central_taxi, central, [[], [], [], []])).
 
-matriz() -> 'servidor@Jorges-MacBook-Pro-3'.
+matriz() -> 'servidor@MacBook-Pro-de-Miguel'.
 
 %registro(Quien, {X, Y}) -> 
 	%llama_servidor({registra_central, Quien, {X, Y}}).
@@ -55,7 +55,7 @@ disponibles([]) ->
 	io:format("----------~n");
 
 disponibles([{_, Modelo, Placas}|Y]) ->
-	io:format("Placas: ~p Modelo: ~p~n", Placas, Modelo),
+	io:format("Placas: ~p Modelo: ~p~n", [Placas, Modelo]),
 	disponibles(Y).
 
 servicios([]) ->

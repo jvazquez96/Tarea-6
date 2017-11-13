@@ -1,7 +1,7 @@
 -module(cliente).
 -export([solicitar/2, cancela/0, mandar_ok/0]).
 
-matrizServidor() -> 'servidor@Jorges-MacBook-Pro-3'.
+matrizServidor() -> 'servidor@MacBook-Pro-de-Miguel'.
 
 solicitar(Nombre, {X, Y}) ->
 	server({solicita, Nombre, {X, Y}}).
