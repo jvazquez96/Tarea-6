@@ -6,7 +6,7 @@ inicio() ->
 	register(central_taxi,
 		spawn(central_taxi, central, [[], [], [], []])).
 
-matriz() -> 'servidor@MacBook-Pro-de-Miguel'.
+matriz() -> 'servidor@Jorges-MacBook-Pro-3'.
 
 %registro(Quien, {X, Y}) -> 
 	%llama_servidor({registra_central, Quien, {X, Y}}).
@@ -22,6 +22,7 @@ central(Disponibles, Completados, Cancelados, Servicios) ->
 			completado(De, Modelo, Placas, Cliente, Disponibles, Completados, Cancelados, Servicios);
 		{De, {necesito_taxi, Cliente, {X,Y}}} ->
 			io:format("Servidor solicita taxi~n"),
+			io:format("Tamano de la lista:~p~n", [length(Disponibles)]),
 			asigna_taxi(De, Cliente, Disponibles, Completados, Cancelados, Servicios, X, Y);
 		{registrar, Quien, {X, Y}} ->
 			Matriz =  matriz(),
