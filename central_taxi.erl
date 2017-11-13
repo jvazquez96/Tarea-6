@@ -27,7 +27,7 @@ central(Disponibles, Completados, Cancelados, Servicios) ->
 			Matriz =  matriz(),
 			monitor_node(Matriz, true),
 			{servidor_taxi, Matriz} ! {self(), {registra_central, Quien, {X, Y}}},
-			central(Disponibles, Completados, Cancelados, Servicios);
+			central(Disponibles, Completados, Cancelados, Servicios);		
 		{_, registrado} ->
 			io:format("Registrado~n"),
 			central(Disponibles, Completados, Cancelados, Servicios);
@@ -48,6 +48,9 @@ para() ->
 listar() ->
 	central_taxi ! lista.
 
+registrar(Quien, {X, Y}) ->
+	central_taxi ! {registrar, Quien, {X, Y}}.
+
 disponibles([]) ->
 	io:format("----------~n");
 
@@ -61,21 +64,6 @@ servicios([]) ->
 servicios([{Taxi, Cliente}|Y]) ->
 	io:format("Taxi: ~p Cliente: ~p~n", Taxi, Cliente),
 	servicios(Y).
-
-% llama al servidor para registro
-%llama_servidor(Mensaje) ->
-	%Matriz =  matriz(),
-	%monitor_node(Matriz, true),
-	%{servidor_taxi, Matriz} ! {self(), Mensaje},
-	%receive
-		%{servidor_taxi, Respuesta} ->
-			%monitor_node(Matriz, false),
-			%Respuesta;
-	%{_, registrado} ->
-			%registrado;
-		%{nodedown, Matriz} ->
-			%no
-	%end.
 
 % funcion que registra un taxi
 registro(De, Modelo, Placas, Disponibles) ->
