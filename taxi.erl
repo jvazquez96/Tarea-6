@@ -2,7 +2,7 @@
 -export([central/0, reportar/2, llegar/0, datos_cliente/2, llama_central/1, cancelar/2, completar/2]).
 
 % nombre largo del servidor (nombre@máquina)
-central() -> 'central@Jorges-MacBook-Pro-3'.
+central() -> 'central@omen-ubuntu'.
 
 % funciones de interfase
 reportar(Modelo, Placas) ->

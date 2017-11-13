@@ -1,12 +1,12 @@
 -module(cliente).
 -export([solicitar/2, cancela/0, mandar_ok/0]).
 
-matrizServidor() -> 'servidor@Jorges-MacBook-Pro-3'.
+matrizServidor() -> 'servidor@omen-ubuntu'.
 
 solicitar(Nombre, {X, Y}) ->
 	server({solicita, Nombre, {X, Y}}).
 
-registra(_, PID) ->
+registra(PID) ->
 	register(taxi, PID).
 
 cancela() ->
@@ -27,9 +27,10 @@ server(Solicitud) ->
 	monitor_node(Matriz, true),
 	{servidor_taxi, Matriz} ! {self(), Solicitud},
 	receive
-		{Quien, {PID, _, _}} ->
-			monitor_node(Matriz, false),
-			registra(Quien, PID);
+
+		{_, {PID, _, _}} ->
+			%monitor_node(Matriz, false),
+			registra(PID);
 		{llegar} ->
 			monitor_node(Matriz, false),
 			mandar_ok();

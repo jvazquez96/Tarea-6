@@ -6,7 +6,7 @@ inicio() ->
 	register(central_taxi,
 		spawn(central_taxi, central, [[], [], [], []])).
 
-matriz() -> 'servidor@Jorges-MacBook-Pro-3'.
+matriz() -> 'servidor@omen-ubuntu'.
 
 %registro(Quien, {X, Y}) -> 
 	%llama_servidor({registra_central, Quien, {X, Y}}).
@@ -55,15 +55,15 @@ registrar(Quien, {X, Y}) ->
 disponibles([]) ->
 	io:format("----------~n");
 
-disponibles([{_, Modelo, Placas}|Y]) ->
-	io:format("Placas: ~p Modelo: ~p~n", [Placas, Modelo]),
+disponibles([{ID, Modelo, Placas}|Y]) ->
+	io:format("ID: ~p Placas: ~p Modelo: ~p~n", [ID, Placas, Modelo]),
 	disponibles(Y).
 
 servicios([]) ->
 	io:format("----------~n");
 
 servicios([{Taxi, Cliente}|Y]) ->
-	io:format("Taxi: ~p Cliente: ~p~n", Taxi, Cliente),
+	io:format("Taxi: ~p Cliente: ~p~n", [Taxi, Cliente]),
 	servicios(Y).
 
 % funcion que registra un taxi
@@ -83,10 +83,10 @@ asigna_taxi(De, Cliente, [], Completados, Cancelados, Servicios, _, _) ->
 	De ! {self(), {sin_taxis, Cliente}},
 	central([], Completados, Cancelados, Servicios);
 
-asigna_taxi(De, Cliente, [{Taxi, Modelo, Placas}|Y], Completados, Cancelados, Servicios, X, Y) ->
+asigna_taxi(De, Cliente, [{Taxi, Modelo, Placas}|Lista], Completados, Cancelados, Servicios, X, Y) ->
 	De ! {self(), Cliente, {Taxi, Modelo, Placas}},
 	Taxi ! {self(), {Cliente, {X, Y}}},
-	central(Y, Completados, Cancelados, lists:append(Servicios, [{Taxi, Cliente}])).
+	central(Lista, Completados, Cancelados, lists:append(Servicios, [{Taxi, Cliente}])).
 
 % funcion que quita el servicio una lista
 quita_servicio(De, [{De, _}|Y]) ->
