@@ -1,6 +1,6 @@
 -module(central_taxi).
 -import(lists, [append/2]).
--export([inicio/0, registro/2, central/4, para/0, listar/0]).
+-export([inicio/0, central/4, para/0, listar/0]).
 
 inicio() ->
 	register(central_taxi,
@@ -8,8 +8,8 @@ inicio() ->
 
 matriz() -> 'servidor@Jorges-MacBook-Pro-3'.
 
-registro(Quien, {X, Y}) -> 
-	llama_servidor({registra_central, Quien, {X, Y}}).
+%registro(Quien, {X, Y}) -> 
+	%llama_servidor({registra_central, Quien, {X, Y}}).
 
 central(Disponibles, Completados, Cancelados, Servicios) ->
 	receive
@@ -20,10 +20,17 @@ central(Disponibles, Completados, Cancelados, Servicios) ->
 			cancelado(De, Modelo, Placas, Cliente, Disponibles, Completados, Cancelados, Servicios);
 		{De, {completar, Modelo, Placas, Cliente}} ->
 			completado(De, Modelo, Placas, Cliente, Disponibles, Completados, Cancelados, Servicios);
-		{De, {necesito_taxi, Cliente, X, Y}} ->
+		{De, {necesito_taxi, Cliente, {X,Y}}} ->
+			io:format("Servidor solicita taxi~n"),
 			asigna_taxi(De, Cliente, Disponibles, Completados, Cancelados, Servicios, X, Y);
+		{registrar, Quien, {X, Y}} ->
+			Matriz =  matriz(),
+			monitor_node(Matriz, true),
+			{servidor_taxi, Matriz} ! {self(), {registra_central, Quien, {X, Y}}},
+			central(Disponibles, Completados, Cancelados, Servicios);
 		{_, registrado} ->
-			registrado;
+			io:format("Registrado~n"),
+			central(Disponibles, Completados, Cancelados, Servicios);
 		lista ->
 			io:format("Disponibles:~n"),
 			disponibles(Disponibles),
@@ -56,19 +63,19 @@ servicios([{Taxi, Cliente}|Y]) ->
 	servicios(Y).
 
 % llama al servidor para registro
-llama_servidor(Mensaje) ->
-	Matriz =  matriz(),
-	monitor_node(Matriz, true),
-	{servidor_taxi, Matriz} ! {self(), Mensaje},
-	receive
-		{servidor_taxi, Respuesta} ->
-			monitor_node(Matriz, false),
-			Respuesta;
-	{_, registrado} ->
-			registrado;
-		{nodedown, Matriz} ->
-			no
-	end.
+%llama_servidor(Mensaje) ->
+	%Matriz =  matriz(),
+	%monitor_node(Matriz, true),
+	%{servidor_taxi, Matriz} ! {self(), Mensaje},
+	%receive
+		%{servidor_taxi, Respuesta} ->
+			%monitor_node(Matriz, false),
+			%Respuesta;
+	%{_, registrado} ->
+			%registrado;
+		%{nodedown, Matriz} ->
+			%no
+	%end.
 
 % funcion que registra un taxi
 registro(De, Modelo, Placas, Disponibles) ->

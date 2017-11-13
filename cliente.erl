@@ -35,6 +35,8 @@ server(Solicitud) ->
 			mandar_ok();
 		{no} ->
 			io:format("No hay centrales disponibles~n",[]);
+		{_, no_hay_taxis} ->
+			io:format("No hay taxis disponibles~n",[]);
 		{nodedown, Matriz} ->
 			adios
 	end.

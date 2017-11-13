@@ -26,6 +26,7 @@ servidor(TablaCentrales) ->
 			~p~n", [NombreCentral, {X,Y}]),
 		% register(NombreCentral, PIDcentral),
 		PIDcentral ! {self(), registrado},
+		io:format("Process id: ~p~n", [PIDcentral]),
 		servidor(lists:append(TablaCentrales, [{PIDcentral, NombreCentral, {X,Y}}]));
 
 	% Respuesta del cliente indicando que llegó al destino
