@@ -6,7 +6,7 @@ inicio() ->
 	register(central_taxi,
 		spawn(central_taxi, central, [[], [], [], []])).
 
-matriz() -> 'servidor@omen-ubuntu'.
+matriz() -> 'servidor@jorges-mbp-3'.
 
 %registro(Quien, {X, Y}) -> 
 	%llama_servidor({registra_central, Quien, {X, Y}}).

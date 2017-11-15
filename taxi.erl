@@ -1,8 +1,11 @@
 -module(taxi).
--export([central/0, reportar/2, llegar/0, datos_cliente/2, llama_central/1, cancelar/2, completar/2]).
+-export([central/0, reportar/2, llegar/0, datos_cliente/2, llama_central/1, cancelar/2, completar/2, inicio/0]).
 
 % nombre largo del servidor (nombre@máquina)
-central() -> 'central@omen-ubuntu'.
+central() -> 'central@jorges-mbp-3'.
+
+inicio() ->
+	register(taxi, spawn(taxi, llama_central, [[]])).
 
 % funciones de interfase
 reportar(Modelo, Placas) ->
@@ -41,6 +44,3 @@ llama_central(Registro) ->
 			no
 			%llama_central(response)
 	end.
-
-
-
